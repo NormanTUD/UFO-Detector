@@ -12,30 +12,30 @@ names:
   7: raketenspirale
   8: heißluftballon
   9: sternschnuppe
-  10: ballon
-  11: zirkumhorizontalbogen
-  12: raketenabgas
-  13: sundog
-  14: lens flare
-  15: rauchring
-  16: lentikularwolke
-  17: stern
-  18: mond
-  19: vogel
-  20: insekt
-  21: fluctus wolke
-  22: leuchtende nachtwolken
-  23: mammatuswolke
-  24: irisierende wolke
-  25: morning glory cloud
-  26: sprite
-  27: fallschirm
-  28: solarballon
-  29: drachen
-  30: polarlicht
-  31: kugelwolke
-  32: regenbogen
-  33: folienballon
+  10: folienballon
+  11: ballon
+  12: zirkumhorizontalbogen
+  13: raketenabgas
+  14: sundog
+  15: lens flare
+  16: rauchring
+  17: lentikularwolke
+  18: stern
+  19: mond
+  20: vogel
+  21: insekt
+  22: fluctus wolke
+  23: leuchtende nachtwolken
+  24: mammatuswolke
+  25: irisierende wolke
+  26: morning glory cloud
+  27: sprite
+  28: fallschirm
+  29: solarballon
+  30: drachen
+  31: polarlicht
+  32: kugelwolke
+  33: regenbogen
   34: reentry
   35: flogo
   36: led-drohnen
@@ -45,13 +45,13 @@ names:
   40: unfokussiertes objekt
   41: starlink
   42: satellit
-  43: vogelschwarm
-  44: elmsfeuer
-  45: paraglider
-  46: mülltüte
-  47: hubschrauber
-  48: planet
-  49: milchstraße
+  43: elmsfeuer
+  44: paraglider
+  45: mülltüte
+  46: hubschrauber
+  47: planet
+  48: milchstraße
+  49: vogelschwarm
   50: funken
   51: sonnenstrahlen
   52: himmelslaterne
@@ -59,8 +59,8 @@ names:
   54: flare
   55: grüner blitz
   56: fledermaus
-  57: halo mond
-  58: blue jet
+  57: blue jet
+  58: halo mond
   59: crown flash
   60: suchscheinwerfer
   61: schmetterling
