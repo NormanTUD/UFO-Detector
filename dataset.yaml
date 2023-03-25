@@ -1,0 +1,68 @@
+path: ./
+train: dataset/images/
+val: dataset/images/
+names:
+  0: halo
+  1: sonne
+  2: skytracker
+  3: light pillar
+  4: kondensstreifen
+  5: flugzeug
+  6: wing suit
+  7: raketenspirale
+  8: heißluftballon
+  9: sternschnuppe
+  10: ballon
+  11: zirkumhorizontalbogen
+  12: raketenabgas
+  13: sundog
+  14: lens flare
+  15: rauchring
+  16: lentikularwolke
+  17: stern
+  18: mond
+  19: vogel
+  20: insekt
+  21: fluctus wolke
+  22: leuchtende nachtwolken
+  23: mammatuswolke
+  24: irisierende wolke
+  25: morning glory cloud
+  26: sprite
+  27: fallschirm
+  28: solarballon
+  29: drachen
+  30: polarlicht
+  31: kugelwolke
+  32: regenbogen
+  33: folienballon
+  34: reentry
+  35: flogo
+  36: led-drohnen
+  37: hole punch cloud
+  38: blitz
+  39: ambosswolke
+  40: unfokussiertes objekt
+  41: starlink
+  42: satellit
+  43: vogelschwarm
+  44: elmsfeuer
+  45: paraglider
+  46: mülltüte
+  47: hubschrauber
+  48: planet
+  49: milchstraße
+  50: funken
+  51: sonnenstrahlen
+  52: himmelslaterne
+  53: bolid
+  54: flare
+  55: grüner blitz
+  56: fledermaus
+  57: halo mond
+  58: blue jet
+  59: crown flash
+  60: suchscheinwerfer
+  61: schmetterling
+  62: elve
+  63: searchlight

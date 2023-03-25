@@ -1,0 +1,11 @@
+The data in this dataset and the model are free to use for every purpose without requiring permission.
+
+Every project that is accessible or has results that are accessible to the public must have the following disclaimer, either in English (or German), well readable. Any translations into other languages are valid, too, but then the english version has to present also:
+
+English Version:
+"A so-called artificial intelligence doesn't know what's on an image. It basically only compares images to previous images, for which humans told the computer what it should recognize there. The results are only suggestions, to be taken with a grain of salt. Please keep that in mind when looking at the analysises this software produces."
+
+German version:
+"Eine sogenannte Künstliche Intelligenz weiß nicht, was auf einem Bild ist. Sie vergleicht es nur mit anderen Bildern, von denen Menschen ihr gesagt haben, was sie dort erkennen soll. Die Ergebnisse sind Vorschläge, keine sicheren Erkenntnisse. Bitte behalten Sie das im Hinterkopf, wenn Sie die Analysen dieser Software betrachten."
+
+Forks can be made, but they have to be under this unchanged license again.
