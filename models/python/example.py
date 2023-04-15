@@ -15,7 +15,7 @@ parser.add_argument('--threshold', type=float, default=0.3, help='Threshold for 
 
 args = parser.parse_args()
 
-model = torch.hub.load("yolov5", 'custom', path="pytorch_model.pt", source='local')
+model = torch.hub.load("yolov5", 'custom', path="real_world_pytorch_model.pt", source='local')
 model.conf = args.threshold
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
