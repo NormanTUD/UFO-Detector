@@ -13,7 +13,7 @@ Output: List of Bounding Boxes, that is, a list of coordinates, categories it de
 # Models
 
 - The real_world_pytorch_model.pt was trained on 54k images of UFO like stuff and about 50k images of a lot of other stuff a phone camera may capture, so it can be used in real world predictions on smart phone with relatively low false positive rates.
-- The limited_pytorch_model.pt (not available yet) is then further trained on the real_world_pytorch_model.pt, but with the empty files absent. This is useful when doing predictions on images where you know that there is something interested. This model will be published once trained
+- The limited_pytorch_model.pt is then further trained on the real_world_pytorch_model.pt, but with the empty files absent. This is useful when doing predictions on images where you know that there is something interested. This model will be published once trained
 
 # How to prepare your environment
 
