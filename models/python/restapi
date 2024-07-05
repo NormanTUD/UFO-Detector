@@ -251,7 +251,9 @@
 
 		if [[ ! -d yolov5 ]]; then
 			green_reset_line "➤Directory 'yolov5' did not exist. Cloning it..."
-			git clone --depth 1 https://github.com/ultralytics/yolov5.git
+			git clone --quiet --depth 1 https://github.com/ultralytics/yolov5.git
+			_tput cr
+			_tput el
 		fi
 	}
 
