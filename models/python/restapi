@@ -1,0 +1,360 @@
+#!/bin/bash
+
+{
+	SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+	cd $SCRIPT_DIR
+
+	install_those=(
+		setuptools
+		wheel
+		numpy
+		torch
+		opencv-python
+		fastapi
+		uvicorn
+	)
+
+	FROZEN=""
+
+	function displaytime {
+		local T=$1
+		local D=$((T/60/60/24))
+		local H=$((T/60/60%24))
+		local M=$((T/60%60))
+		local S=$((T%60))
+		(( $D > 0 )) && printf '%d days ' $D
+		(( $H > 0 )) && printf '%d hours ' $H
+		(( $M > 0 )) && printf '%d minutes ' $M
+		(( $D > 0 || $H > 0 || $M > 0 )) && printf 'and '
+		printf '%d seconds\n' $S
+	}
+
+	export PYTHONDONTWRITEBYTECODE=1
+
+	IFS=$'\n'
+
+	Green='\033[0;32m'
+	Color_Off='\033[0m'
+	Red='\033[0;31m'
+
+	function red_text {
+		echo -ne "${Red}$1${Color_Off}"
+	}
+
+	function green {
+		echo -ne "${Green}$1${Color_Off}"
+	}
+
+	function green_reset_line {
+		_tput cr
+		_tput el
+		green "$1"
+	}
+
+	function red_reset_line {
+		_tput cr
+		_tput el
+		red_text "$1"
+	}
+
+	function _tput {
+		set +e
+		CHAR=$1
+
+		if ! command -v tput 2>/dev/null >/dev/null; then
+			red_text "tput not installed" >&2
+			set +e
+			return 0
+		fi
+
+		if [[ -z $CHAR ]]; then
+			red_text "No character given" >&2
+			set +e
+			return 0
+		fi
+
+		if ! tty 2>/dev/null >/dev/null; then
+			echo ""
+			set +e
+			return 0
+		fi
+
+		tput $CHAR
+		set +e
+	}
+
+
+
+	set -e
+
+	LMOD_DIR=/software/foundation/$(uname -m)/lmod/lmod/libexec
+
+	myml () {
+		if [[ -e $LMOD_DIR/ml_cmd ]]; then
+			eval "$($LMOD_DIR/ml_cmd "$@")" 2>/dev/null >/dev/null
+		fi
+	}
+
+	if [ -z "$LOAD_MODULES" ] || [ "$LOAD_MODULES" -eq 1 ]; then
+		myml release/23.04 GCCcore/12.2.0 Python/3.10.8 GCCcore/11.3.0 Tkinter/3.10.4
+
+		if [[ $(uname -m) == "ppc64le" ]]; then
+			myml GCC/12.2.0 OpenBLAS/0.3.21
+		fi
+	fi
+
+	VENV_DIR_NAME=".ufo_detector_rest_api_env_$(uname -m)_$(python3 --version | sed -e 's# #_#g')"
+
+	ROOT_VENV_DIR=$HOME
+
+	if [[ ! -z $root_venv_dir ]] && [[ -d $root_venv_dir ]]; then
+		ROOT_VENV_DIR=$root_venv_dir
+	fi
+
+	VENV_DIR=$ROOT_VENV_DIR/$VENV_DIR_NAME
+
+	UPGRADED_PIP=0
+	NUMBER_OF_INSTALLED_MODULES=0
+	PROGRESSBAR=""
+
+	generate_progress_bar() {
+		NUMBER_OF_INSTALLED_MODULES=$(get_nr_of_already_installed_modules)
+		local current_progress=$NUMBER_OF_INSTALLED_MODULES
+		local total_progress=$1
+
+		# Überprüfen, ob die Eingaben gültige positive Ganzzahlen sind
+		if ! [[ "$current_progress" =~ ^[0-9]+$ ]] || ! [[ "$total_progress" =~ ^[0-9]+$ ]]; then
+			echo "Fehler: Beide Parameter müssen positive Ganzzahlen sein, sind $current_progress/$total_progress." >&2
+			return 1
+		fi
+
+		# Überprüfen, ob der aktuelle Fortschritt den Gesamtfortschritt nicht überschreitet
+		if [ "$current_progress" -gt "$total_progress" ]; then
+			echo "Fehler: Der aktuelle Fortschritt darf den Gesamtfortschritt nicht überschreiten ($current_progress/$total_progress)." >&2
+			return 1
+		fi
+
+		local bar_length=30
+		local filled_length=$((bar_length * current_progress / total_progress))
+		local empty_length=$((bar_length - filled_length))
+
+		local bar=""
+		for ((i = 0; i < filled_length; i++)); do
+			bar="${bar}#"
+		done
+		for ((i = 0; i < empty_length; i++)); do
+			bar="${bar} "
+		done
+
+		echo "[${bar}] "
+	}
+
+	function ppip {
+		MODULE=$1
+		AS_REQUIREMENT_OF=$2
+		NUMBER_OF_MAIN_MODULES=$3
+
+		set +e
+
+		PROGRESSBAR=$(generate_progress_bar $NUMBER_OF_MAIN_MODULES)
+
+		MODULES_WITHOUT_VERSIONS=$(echo "$MODULE" | sed -e 's#[=<>]=.*##' -e 's#~.*##')
+
+		echo "$FROZEN" | grep -i "$MODULES_WITHOUT_VERSIONS" 2>/dev/null >/dev/null
+		_exit_code=$?
+
+		if [[ "$_exit_code" != "0" ]]; then
+			#if [[ "$UPGRADED_PIP" -eq "0" ]]; then
+			#	pip install --upgrade pip
+			#	UPGRADED_PIP=1
+			#fi
+
+			if [[ "$MODULE" != "$AS_REQUIREMENT_OF" ]] && [[ "$AS_REQUIREMENT_OF" != "-" ]]; then
+				k=0
+
+				for i in $(pip3 install --disable-pip-version-check --dry-run $MODULE | grep -v "already satisfied" | grep "Collecting" | sed -e 's#Collecting ##' | grep -v "^$MODULE$"); do
+					if [[ "$i" != $MODULE ]]; then
+						if [[ $k -eq 0 ]]; then
+							green_reset_line "${PROGRESSBAR}➤Installing requirements for $MODULE"
+						fi
+						ppip $i $MODULE $NUMBER_OF_MAIN_MODULES || {
+							red_reset_line "❌Failed to install $i."
+
+							exit 3
+						}
+
+						k=$((k+1))
+					fi
+				done
+
+				if [[ $k -gt 0 ]]; then
+					green_reset_line "${PROGRESSBAR}➤Installed all requirements for $MODULE, now installing the package itself..."
+				fi
+			fi
+
+			green_reset_line "${PROGRESSBAR}➤Installing $MODULE..."
+			mkdir -p .pip_logs
+			pip3 --disable-pip-version-check install -q $MODULE 2>> .pip_logs/install_errors || {
+				red_reset_line "❌Failed to install $MODULE. Check .pip_logs/install_errors."
+				exit 3
+			}
+
+			FROZEN=$(pip list --format=freeze)
+
+			PROGRESSBAR=$(generate_progress_bar $NUMBER_OF_MAIN_MODULES)
+
+			green_reset_line "${PROGRESSBAR}✅$MODULE installed successfully"
+		fi
+		set -e
+	}
+
+	get_nr_of_already_installed_modules () {
+		nr=0
+		for key in "${!install_those[@]}"; do
+			noversion=$(echo "${install_those[$key]}" | sed -e 's#[=<>]=.*##' -e 's#~.*##')
+			if echo "$FROZEN" | grep -i "$noversion" 2>/dev/null >/dev/null; then
+				nr=$(($nr+1))
+			fi
+		done
+
+		echo "$nr"
+	}
+
+	function install_required_modules {
+		green_reset_line "➤Checking environment $VENV_DIR..."
+		MAX_NR="${#install_those[@]}"
+		NUMBER_OF_INSTALLED_MODULES=$(get_nr_of_already_installed_modules)
+
+		PROGRESSBAR=$(generate_progress_bar $MAX_NR)
+
+		if [[ "$MAX_NR" -ne "$NUMBER_OF_INSTALLED_MODULES" ]]; then
+			for key in "${!install_those[@]}"; do
+				install_this=${install_those[$key]}
+				PROGRESSBAR=$(generate_progress_bar $MAX_NR)
+				green_reset_line "${PROGRESSBAR}➤Checking if $install_this is installed..."
+				ppip $install_this "-" $MAX_NR
+			done
+
+			_tput cr
+			_tput el
+		fi
+		green_reset_line "✅Environment checking done!"
+		_tput cr
+		_tput el
+	}
+
+	if [[ "$SCRIPT_DIR" != *"$VENV_DIR"* ]]; then
+		if [[ ! -d "$VENV_DIR" ]]; then
+			if ! command -v gcc >/dev/null 2>/dev/null; then
+				red_text "❌GCC not found. Try installing with, for example, with 'sudo apt-get install gcc' (depending on your distro)"
+				exit 3
+			fi
+
+			if ! command -v resize >/dev/null 2>/dev/null; then
+				red_text "❌resize not found. Try installing xterm with, for example, with 'sudo apt-get install xterm' (depending on your distro)"
+				#exit 4
+			fi
+
+			if ! python3 -c 'from distutils.sysconfig import get_makefile_filename as m; from os.path import isfile; import sys ; sys.exit(not isfile(m()))' >/dev/null 2>/dev/null; then
+				red_text "❌python3 header files not found. Try installing them, for example, with 'sudo apt-get install python3-dev' (depending on your distro)"
+				exit 5
+			fi
+
+			green_reset_line "${PROGRESSBAR}➤Environment $VENV_DIR was not found. Creating it..."
+			python3 -mvenv $VENV_DIR/ || {
+				red_text "❌Failed to create Virtual Environment in $VENV_DIR"
+				exit 1
+			}
+
+			green_reset_line "✅Virtual Environment $VENV_DIR created. Activating it..."
+
+			if [[ -e "$VENV_DIR/bin/activate" ]]; then
+				source $VENV_DIR/bin/activate || {
+					red_text "❌Failed to activate $VENV_DIR"
+					exit 2
+				}
+			else
+				red_text "❌Failed to activate $VENV_DIR"
+				exit 2
+			fi
+
+			green_reset_line "✅Virtual Environment activated. Now installing software. This may take some time."
+
+		fi
+	fi
+
+	if [[ -e "$VENV_DIR/bin/activate" ]]; then
+		source $VENV_DIR/bin/activate || {
+			red_reset_line "❌Failed to activate $VENV_DIR. Deleting venv and creating it again..."
+			rm -rf $VENV_DIR
+
+			python3 -mvenv $VENV_DIR/ || {
+				red_text "❌Failed to create Virtual Environment in $VENV_DIR"
+				rm -rf $VENV_DIR
+				exit 1
+			}
+
+			source $VENV_DIR/bin/activate || {
+				red_reset_line "❌Failed to activate recreated $VENV_DIR. Deleting venv and NOT trying again..."
+				exit 1
+			}
+
+			install_required_modules
+		}
+	else
+		red_reset_line "❌Failed to activate $VENV_DIR. Deleting venv and creating it again..."
+		rm -rf $VENV_DIR
+
+		python3 -mvenv $VENV_DIR/ || {
+			red_text "❌Failed to create Virtual Environment in $VENV_DIR"
+			exit 1
+		}
+
+		if [[ -e "$VENV_DIR/bin/activate" ]]; then
+			source $VENV_DIR/bin/activate || {
+				red_reset_line "❌Failed to activate recreated $VENV_DIR. Deleting venv and NOT trying again..."
+				rm -rf $VENV_DIR
+				exit 1
+			}
+		else
+			red_reset_line "❌Failed to activate recreated $VENV_DIR. Deleting venv and NOT trying again..."
+			rm -rf $VENV_DIR
+			exit 1
+		fi
+
+		install_required_modules
+
+	fi
+
+	if [[ -z $DONT_INSTALL_MODULES ]]; then
+		if [[ -z $SLURM_JOB_ID ]]; then
+			set +e
+			FROZEN=$(pip list --format=freeze)
+			exit_code_pip=$?
+			set -e
+
+			if [[ "$exit_code_pip" -ne "0" ]]; then
+				echo "pip list --format=freeze exited with exit code $exit_code_pip\n"
+				exit 12
+			fi
+
+			install_required_modules
+		fi
+	else
+		if [[ -z $DONT_SHOW_DONT_INSTALL_MESSAGE ]]; then
+			red_text "\$DONT_INSTALL_MODULES is set. Don't install modules.\n"
+		fi
+	fi
+
+	export PYTHONPATH=$VENV_DIR:$PYTHONPATH
+
+	#echo "PATH: $PATH"
+	#echo "VIRTUAL_ENV: $VIRTUAL_ENV"
+}
+
+python3 restapi.py $*
+exit_code=$?
+
+echo "restapi script runtime: $(displaytime $SECONDS)"
+
+exit $exit_code
