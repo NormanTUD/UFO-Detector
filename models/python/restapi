@@ -248,6 +248,11 @@
 		green_reset_line "✅Environment checking done!"
 		_tput cr
 		_tput el
+
+		if [[ ! -d yolov5 ]]; then
+			green_reset_line "➤Directory 'yolov5' did not exist. Cloning it..."
+			git clone --depth 1 https://github.com/ultralytics/yolov5.git
+		fi
 	}
 
 	if [[ "$SCRIPT_DIR" != *"$VENV_DIR"* ]]; then
