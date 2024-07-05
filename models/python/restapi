@@ -15,6 +15,9 @@
 		pandas
 		requests
 		Pillow
+		ultralytics
+		matplotlib
+		torchvision
 	)
 
 	FROZEN=""
