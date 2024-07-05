@@ -12,6 +12,9 @@
 		opencv-python
 		fastapi
 		uvicorn
+		pandas
+		requests
+		Pillow
 	)
 
 	FROZEN=""
