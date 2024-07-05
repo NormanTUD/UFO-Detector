@@ -18,6 +18,7 @@
 		ultralytics
 		matplotlib
 		torchvision
+		gitpython
 	)
 
 	FROZEN=""
