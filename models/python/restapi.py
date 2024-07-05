@@ -27,15 +27,23 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         img = await file.read()
         np_buffer = np.frombuffer(img, np.uint8)
-        image = cv2.imdecode(np_buffer,
-                             cv2.IMREAD_COLOR)[..., ::-1]
+        image = cv2.imdecode(np_buffer, cv2.IMREAD_COLOR)[..., ::-1]
     except:
-        return fastapi.responses.JSONResponse(content={"filename": file.filename, "message": "Cannot decode image"})
+        return fastapi.responses.JSONResponse(content={
+            "filename": file.filename,
+            "message": "Cannot decode image"
+        })
     finally:
         pass
 
     result = model(image)
-    return fastapi.responses.JSONResponse(content={"filename": file.filename, "message": "File uploaded successfully", "shape": image.shape, "xywh": result.pandas().xywh[0].to_json(), "xyxy": result.pandas().xyxy[0].to_json()})
+    return fastapi.responses.JSONResponse(content={
+        "filename": file.filename, 
+        "message": "File uploaded successfully", 
+        "shape": image.shape, 
+        "xywh": result.pandas().xywh[0].to_json(), 
+        "xyxy": result.pandas().xyxy[0].to_json()
+    })
 
 
 if __name__ == "__main__":
