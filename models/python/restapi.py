@@ -79,6 +79,9 @@ async def upload_file(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
+    print("""
+curl -X "POST"  "http://127.0.0.1:8001/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
+""")
     args = parse_arguments()
     model.conf = args.detection_threshold  # Threshold
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
