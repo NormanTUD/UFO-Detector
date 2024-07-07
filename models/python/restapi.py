@@ -8,6 +8,7 @@ import torch
 import argparse
 import re
 import logging
+import uvicorn
 
 def log(message):
     print(message)
@@ -44,9 +45,6 @@ def parse_arguments():
 
 fastapi.responses.JSONResponse
 
-# RestAPI request example for local file example.jpg
-# curl -X "POST"  "http://127.0.0.1:8001/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
-
 model = torch.hub.load(
     "yolov5", 'custom', path="real_world_pytorch_model.pt", source='local')
 
@@ -78,11 +76,10 @@ async def upload_file(file: UploadFile = File(...)):
 
 
 if __name__ == "__main__":
-    import uvicorn
-    print("""
-curl -X "POST"  "http://127.0.0.1:8001/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
-""")
     args = parse_arguments()
+    print(f"""
+curl -X "POST"  "http://{args.bind_ip_address}:{args.port}/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
+""")
     model.conf = args.detection_threshold  # Threshold
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     uvicorn.run(app, host=args.bind_ip_address, port=args.bind_port)
