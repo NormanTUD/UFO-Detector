@@ -78,7 +78,7 @@ async def upload_file(file: UploadFile = File(...)):
 if __name__ == "__main__":
     args = parse_arguments()
     print(f"""
-curl -X "POST"  "http://{args.bind_ip_address}:{args.port}/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
+curl -X "POST"  "http://{args.bind_ip_address}:{args.bind_port}/classify-image/" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "file=@example.jpg;type=image/jpeg"
 """)
     model.conf = args.detection_threshold  # Threshold
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
