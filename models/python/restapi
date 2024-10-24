@@ -19,6 +19,7 @@
 		matplotlib
 		torchvision
 		gitpython
+		python-multipart
 	)
 
 	FROZEN=""
