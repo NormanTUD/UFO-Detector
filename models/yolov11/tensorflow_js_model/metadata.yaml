@@ -1,0 +1,76 @@
+description: Ultralytics YOLO11n model trained on dataset.yaml
+author: Ultralytics
+date: '2025-09-16T10:56:32.867896'
+version: 8.3.200
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 800
+- 800
+names:
+  0: halo
+  1: sonne
+  2: skytracker
+  3: light pillar
+  4: kondensstreifen
+  5: flugzeug
+  6: wing suit
+  7: raketenspirale
+  8: heißluftballon
+  9: sternschnuppe
+  10: ballon
+  11: zirkumhorizontalbogen
+  12: raketenabgas
+  13: sundog
+  14: lens flare
+  15: rauchring
+  16: lentikularwolke
+  17: stern
+  18: mond
+  19: vogel
+  20: insekt
+  21: fluctus wolke
+  22: leuchtende nachtwolken
+  23: mammatuswolke
+  24: irisierende wolke
+  25: morning glory cloud
+  26: fallschirm
+  27: solarballon
+  28: drachen
+  29: polarlicht
+  30: kugelwolke
+  31: regenbogen
+  32: folienballon
+  33: reentry
+  34: led-drohnen
+  35: hole punch cloud
+  36: blitz
+  37: ambosswolke
+  38: unfokussiertes objekt
+  39: starlink
+  40: satellit
+  41: paraglider
+  42: mülltüte
+  43: hubschrauber
+  44: planet
+  45: sprite
+  46: milchstraße
+  47: vogelschwarm
+  48: funken
+  49: sonnenstrahlen
+  50: himmelslaterne
+  51: bolid
+  52: flare
+  53: grüner blitz
+  54: fledermaus
+  55: halo mond
+  56: crown flash
+args:
+  batch: 1
+  half: false
+  int8: false
+  nms: false
+channels: 3
